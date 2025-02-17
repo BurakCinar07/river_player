@@ -80,36 +80,73 @@ class _BetterPlayerMaterialControlsState
             ? cancelAndRestartTimer()
             : changePlayerControlsNotVisible(true);
       },
-      onDoubleTap: () {
-        if (BetterPlayerMultipleGestureDetector.of(context) != null) {
-          BetterPlayerMultipleGestureDetector.of(context)!.onDoubleTap?.call();
-        }
-        cancelAndRestartTimer();
-      },
-      onLongPress: () {
-        if (BetterPlayerMultipleGestureDetector.of(context) != null) {
-          BetterPlayerMultipleGestureDetector.of(context)!.onLongPress?.call();
-        }
-      },
-      child: AbsorbPointer(
-        absorbing: controlsNotVisible,
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            if (_wasLoading)
-              Center(child: _buildLoadingWidget())
-            else
-              _buildHitArea(),
-            Positioned(
-              top: 0,
+      child: Stack(
+        fit: StackFit.passthrough,
+        children: [
+          AbsorbPointer(
+            absorbing: controlsNotVisible,
+            child: _wasLoading
+                ? Center(child: _buildLoadingWidget())
+                : _buildHitArea(),
+          ),
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: AbsorbPointer(
+                absorbing: controlsNotVisible, child: _buildTopBar()),
+          ),
+          Positioned(
+              bottom: 0,
               left: 0,
               right: 0,
-              child: _buildTopBar(),
-            ),
-            Positioned(bottom: 0, left: 0, right: 0, child: _buildBottomBar()),
-            _buildNextVideoWidget(),
-          ],
-        ),
+              child: AbsorbPointer(
+                  absorbing: controlsNotVisible, child: _buildBottomBar())),
+          AbsorbPointer(
+              absorbing: controlsNotVisible, child: _buildNextVideoWidget()),
+          Container(
+            child: Center(
+                child: Container(
+              width: double.infinity,
+              height: double.infinity,
+              child: _betterPlayerController?.isLiveStream() == true
+                  ? const SizedBox()
+                  : Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        if (_controlsConfiguration.enableSkips)
+                          Expanded(
+                            child: GestureDetector(
+                              behavior: HitTestBehavior.translucent,
+                              onDoubleTap: () {
+                                skipBackDoubleTap();
+                                controlsNotVisible
+                                    ? cancelAndRestartTimer()
+                                    : changePlayerControlsNotVisible(false);
+                              },
+                            ),
+                          )
+                        else
+                          const SizedBox(),
+                        if (_controlsConfiguration.enableSkips)
+                          Expanded(
+                            child: GestureDetector(
+                              behavior: HitTestBehavior.translucent,
+                              onDoubleTap: () {
+                                skipForwardDoubleTap();
+                                controlsNotVisible
+                                    ? cancelAndRestartTimer()
+                                    : changePlayerControlsNotVisible(true);
+                              },
+                            ),
+                          )
+                        else
+                          const SizedBox(),
+                      ],
+                    ),
+            )),
+          ),
+        ],
       ),
     );
   }

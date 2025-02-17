@@ -363,8 +363,8 @@ class BetterPlayerController {
       subtitlesLines.addAll(subtitlesParsed);
     }
 
-    _postEvent(BetterPlayerEvent(BetterPlayerEventType.changedSubtitles));
     if (!_disposed && !sourceInitialize) {
+      _postEvent(BetterPlayerEvent(BetterPlayerEventType.changedSubtitles));
       _postControllerEvent(BetterPlayerControllerEvent.changeSubtitles);
     }
   }

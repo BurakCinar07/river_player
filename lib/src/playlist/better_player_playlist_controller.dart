@@ -74,7 +74,7 @@ class BetterPlayerPlaylistController {
       return;
     }
     final int nextDataSourceId = _getNextDataSourceIndex();
-    if (nextDataSourceId == -1) {
+    if (nextDataSourceId == -1 || this._currentDataSourceIndex == nextDataSourceId) {
       return;
     }
     if (_betterPlayerController!.isFullScreen) {
@@ -91,7 +91,8 @@ class BetterPlayerPlaylistController {
   void _handleEvent(BetterPlayerEvent betterPlayerEvent) {
     if (betterPlayerEvent.betterPlayerEventType ==
         BetterPlayerEventType.finished) {
-      if (_getNextDataSourceIndex() != -1) {
+      var nextDataSourceIndex = _getNextDataSourceIndex();
+      if (nextDataSourceIndex != -1 && this._currentDataSourceIndex != nextDataSourceIndex) {
         _betterPlayerController!.startNextVideoTimer();
       }
     }
@@ -122,7 +123,7 @@ class BetterPlayerPlaylistController {
       return currentIndex + 1;
     } else {
       if (betterPlayerPlaylistConfiguration.loopVideos) {
-        return 0;
+        return currentIndex;
       } else {
         return -1;
       }
